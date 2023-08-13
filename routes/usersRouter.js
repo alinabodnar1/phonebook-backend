@@ -2,7 +2,14 @@ const express = require("express");
 
 const usersRouter = express.Router();
 
-const { signup, loginController } = require("../controllers/userControllers");
+const authentificate = require("../middlewares/authentificate");
+
+const {
+  signup,
+  loginController,
+  logout,
+  currentUser,
+} = require("../controllers/userControllers");
 
 const {
   signupSchema,
@@ -14,8 +21,8 @@ usersRouter.post("/signup", validateBody(signupSchema), signup);
 
 usersRouter.post("/login", validateBody(loginSchema), loginController);
 
-usersRouter.post("/logout");
+usersRouter.post("/logout", authentificate, logout);
 
-usersRouter.get("/current");
+usersRouter.get("/current", authentificate, currentUser);
 
 module.exports = usersRouter;

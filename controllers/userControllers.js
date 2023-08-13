@@ -77,7 +77,25 @@ const loginController = async (req, res) => {
   });
 };
 
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
+
+  res.status(204).json();
+};
+
+const currentUser = (req, res) => {
+  const { name, email } = req.user;
+
+  res.json({
+    name,
+    email,
+  });
+};
+
 module.exports = {
   signup,
   loginController,
+  logout,
+  currentUser,
 };
