@@ -15,7 +15,12 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    token: String,
+    avatar: {
+      type: String,
+    },
+    token: {
+      type: String
+    },
   },
   { versionKey: false }
 );

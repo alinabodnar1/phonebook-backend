@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../db/models/userModel");
+const path = require("path");
+const fs = require("fs/promises");
+const gravatar = require("gravatar");
 
 const { SECRET_KEY } = process.env;
 
@@ -16,10 +19,13 @@ const signup = async (req, res) => {
     return;
   }
 
+  const avatar = gravatar.url(email);
+
   const newUser = new User({
     name,
     email,
     password,
+    avatar,
   });
 
   await newUser.hashPassword(password);
@@ -36,12 +42,13 @@ const signup = async (req, res) => {
     user: {
       name: newUser.name,
       email: newUser.email,
+      avatar: newUser.avatar,
     },
   });
 };
 
 const loginController = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password} = req.body;
 
   const user = await User.findOne({ email });
 
@@ -73,6 +80,7 @@ const loginController = async (req, res) => {
     user: {
       name: user.name,
       email,
+      avatar: user.avatar,
     },
   });
 };
@@ -85,17 +93,41 @@ const logout = async (req, res) => {
 };
 
 const currentUser = (req, res) => {
-  const { name, email } = req.user;
+  const { name, email, avatar } = req.user;
 
   res.json({
     name,
     email,
+    avatar,
   });
 };
+
+const updateAvatar = async(req,res) => {
+  const {_id} = req.user;
+
+  const { path: tmpUpload, originalname} = req.file;
+
+  const filename = `${_id}_${originalname}`;
+
+  const resultUpload = path.join(__dirname,"../", "public", "avatars", filename);
+
+  await fs.rename(tmpUpload,resultUpload);
+
+  const avatar = path.join("avatars", filename);
+
+  await User.findByIdAndUpdate(_id, {avatar});
+
+  res.json({
+    avatar,
+  })
+
+}
+
 
 module.exports = {
   signup,
   loginController,
   logout,
   currentUser,
+  updateAvatar,
 };

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/", authentificate, getAll);
 
-router.post("/");
+router.post("/"); // описати з owner
 
 router.delete("/:contactId", authentificate, isValidContactId, deleteById);
 
